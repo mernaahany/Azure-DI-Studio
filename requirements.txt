@@ -1,0 +1,24 @@
+streamlit
+streamlit-drawable-canvas
+
+azure-ai-documentintelligence  # custom model trainer (v4.0 SDK)
+azure-ai-formrecognizer         # prebuilt models (legacy SDK)
+azure-storage-blob
+azure-core
+
+PyMuPDF
+Pillow
+
+pandas
+openpyxl
+python-dotenv
+requests
+openpyxl
+plotly
+httpx
+xtraction
+
+multipart
+fastapi
+pydantic
+uvicorn
