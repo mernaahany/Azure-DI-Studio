@@ -1,0 +1,39 @@
+venv/
+__pycache__/
+*.pyc
+.env
+outputs/
+*.log
+
+# Virtual environments
+venv/
+.env/
+.env
+*.venv
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Streamlit and cache
+.streamlit/
+.cache/
+
+# Logs and runtime
+*.log
+*.pot
+*.mo
+
+# Azure and local secrets
+azure*local*
+credentials
+*.json
+*.key
+*.pem
+
+# Dataset and output files
+outputs/*
+data/*
+outputs/
