@@ -10,6 +10,10 @@ from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.core.credentials import AzureKeyCredential
 
 from utils.pdf_utils import field_color, render_page_pil, get_page_count
+from utils.config import endpoint, key
+
+di_endpoint = endpoint
+di_key      = key
 
 
 # ──────────────────────────────────────────────────────────────────────────────

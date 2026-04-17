@@ -12,7 +12,7 @@ class AzureConfig:
 
     # Blob Storage (custom model)
     conn_string:  str = field(default_factory=lambda: os.getenv("CONNECTION_STRING", ""))
-    container: str = field(default_factory=lambda: os.getenv("CONTAINER", ""))
+    container: str = field(default_factory=lambda: os.getenv("BLOB_CONTAINER", ""))
     blob_sas_url:   str = field(default_factory=lambda: os.getenv("AZURE_BLOB_SAS_URL", ""))
     blob_sas_token: str = field(default_factory=lambda: os.getenv("AZURE_BLOB_SAS_TOKEN", ""))
     account_url:   str = field(default_factory=lambda: os.getenv("ACCOUNT_URL", ""))
@@ -57,14 +57,6 @@ sas_token                           = azure.sas_token
 class AppConfig:
     ENV: str = os.getenv("APP_ENV", "development")
     OUTPUT_DIR: str = os.getenv("OUTPUT_DIR", "outputs")
-    #  Azure model ID
-    MODEL_MAP: dict = field(default_factory=lambda: {
-        "OCR (Read)":        "prebuilt-read",
-        "Layout Analysis":   "prebuilt-layout",
-        "General Document":  "prebuilt-document",
-        "Invoice":           "prebuilt-invoice",
-        "Receipt":           "prebuilt-receipt",
-    })
 
     SUPPORTED_EXTENSIONS: tuple = (".pdf", ".png", ".jpg", ".jpeg", ".tiff", ".bmp")
     MAX_FILE_SIZE_MB: int        = 50

@@ -6,8 +6,8 @@ Identical logic to the original app.py but with unified theme + Home nav.
 
 import streamlit as st
 
-from prebuilt.ui.theme import apply_theme, PRIMARY, TEXT_MUTED
-from utils.config import SESSION_DEFAULTS
+from theme import apply_theme, PRIMARY, TEXT_MUTED
+from utils.config import SESSION_DEFAULTS, di_endpoint, di_key, conn_string, container, blob_sas_url, account_url, sas_token
 
 from custom.steps.step1_upload import render_step1
 from custom.steps.step2_fields import render_step2
@@ -32,10 +32,21 @@ for k, v in SESSION_DEFAULTS.items():
 with st.sidebar:
     st.markdown(f'<h2 style="color:{PRIMARY};margin-top:0">⚙️ Configuration</h2>', unsafe_allow_html=True)
 
-    di_endpoint    = st.text_input("DI Endpoint",            placeholder="https://<resource>.cognitiveservices.azure.com/")
-    di_key         = st.text_input("DI Key",                 type="password")
-    blob_conn_str  = st.text_input("Blob Connection String", type="password")
-    blob_container = st.text_input("Blob Container",         placeholder="training-docs")
+    di_endpoint    = st.text_input("DI Endpoint", value=di_endpoint)
+    di_key         = st.text_input("DI Key", type="password", value=di_key)
+    blob_conn_str  = st.text_input("Blob Connection String", type="password", value=conn_string)
+    blob_container = st.text_input("Blob Container", value=container)
+    blob_sas_url = st.text_input("Blob SAS URL", value=blob_sas_url)
+    account_url = st.text_input("Account URL", value=account_url)
+    sas_token = st.text_input("SAS Token", value=sas_token, type="password")
+
+    st.session_state["di_endpoint"]    = di_endpoint
+    st.session_state["di_key"]         = di_key
+    st.session_state["blob_conn_str"]  = blob_conn_str
+    st.session_state["blob_container"] = blob_container
+    st.session_state["blob_sas_url"]   = blob_sas_url
+    st.session_state["sas_token"]   = sas_token
+    st.session_state["account_url"]   = account_url
 
     st.divider()
 

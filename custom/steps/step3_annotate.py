@@ -96,12 +96,12 @@ def _extract_text(
     x1n = orig_x / img_w
     y1n = orig_y / img_h
     x2n = (orig_x + orig_w) / img_w
-    y2n = (orig_y + orig_h) / img_h
+    y2n = (orig_y + orig_h) / img_h # user-drawn box is converted to normalised coordinates to match the format of the OCR.
  
-    return get_words_in_box(
+    return get_words_in_box( #overlaping , words.
         ocr_data=get_ocr_data(selected_pdf),
         page_number=page_num + 1,          # Azure OCR is 1-based
-        box_norm=(x1n, y1n, x2n, y2n),
+        box_norm=(x1n, y1n, x2n, y2n), #user bardo btmatch m3  ocr azure
     )
  
  
@@ -521,7 +521,7 @@ def render_step3(di_endpoint: str = "", di_key: str = ""):
                     unsafe_allow_html=True,
                 )
             else:
-                c4.markdown(
+                c4.markdown( #  extracted text is empty
                     '<span style="color:#c53030;font-size:12px">⚠ no text</span>',
                     unsafe_allow_html=True,
                 )

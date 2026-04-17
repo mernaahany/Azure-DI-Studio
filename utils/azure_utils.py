@@ -1,15 +1,25 @@
 import json
 from datetime import datetime, timezone
-
+import streamlit as st
 from azure.storage.blob import BlobServiceClient
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.core.credentials import AzureKeyCredential
+import os
+from utils.config import AzureConfig
+from dotenv import load_dotenv  
+from utils.config import account_url, sas_token
 
-from utils.config import account_url, sas_token, container
-
-
+load_dotenv
 def upload_to_blob(file_name: str, file_data: bytes) -> None:
+    account_url   = st.session_state.get("account_url", "")
+    account_url = os.getenv("ACCOUNT_URL", "")
+    sas_token = os.getenv("SAS_TOKEN", "")
+    container = os.getenv("CONTAINER", "")
+    container = st.session_state.get("blob_container", "")
+    sas_token = st.session_state.get("sas_token", "")
+    
     client = BlobServiceClient(account_url=account_url, credential=sas_token)
+    
     container_client = client.get_container_client(container)
     container_client.upload_blob(
         name=file_name,

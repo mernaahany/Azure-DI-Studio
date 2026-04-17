@@ -108,9 +108,9 @@ def run_ocr(
     poller = client.begin_analyze_document(
         model_id="prebuilt-read",
         body=file_bytes,
-        content_type="application/octet-stream",
+        content_type="application/octet-stream", # description for the doc type for all types "binary"  to send it via server http request.
     )
-    result = poller.result()
+    result = poller.result() # state of the long-running operation is polled until completion, and the final result is returned. If the operation fails, an exception is raised.
 
     parsed_pages = []
     for page in result.pages or []:
@@ -124,19 +124,19 @@ def run_ocr(
             if len(poly) < 8:
                 continue
 
-            xs = [poly[i]   for i in range(0, len(poly), 2)]
+            xs = [poly[i]   for i in range(0, len(poly), 2)] 
             ys = [poly[i+1] for i in range(0, len(poly), 2)]
             x_min, x_max = min(xs), max(xs)
-            y_min, y_max = min(ys), max(ys)
+            y_min, y_max = min(ys), max(ys) # bounding box of the word in page units
 
             words.append({
                 "content":   word.content,
-                "polygon":   list(poly),
+                "polygon":   list(poly), # coordinates  comes in page units (points for PDFs, pixels for images) from Azure.
                 "bbox_norm": [
                     x_min / page_w,
                     y_min / page_h,
                     x_max / page_w,
-                    y_max / page_h,
+                    y_max / page_h, #compare while the user draws a box, the overlap between the word's bbox and the user-drawn box is calculated using the normalised coordinates, which allows for consistent calculations regardless of the original page dimensions.
                 ],
             })
 
@@ -148,7 +148,7 @@ def run_ocr(
         })
 
     data = {"pages": parsed_pages}
-    _get_cache()[doc_name] = data
+    _get_cache()[doc_name] = data # store the parsed OCR data in the session state cache under the document name key for later retrieval and use in annotation and training steps.
     return data
 
 
@@ -179,10 +179,10 @@ def get_words_in_box(
     Space-joined string of matching words in reading order (top→bottom,
     left→right), or an empty string if nothing matches.
     """
-    bx1, by1, bx2, by2 = box_norm
+    bx1, by1, bx2, by2 = box_norm 
     matched: list[tuple[float, float, str]] = []   # (top, left, content)
 
-    for page in ocr_data.get("pages", []):
+    for page in ocr_data.get("pages", []): 
         if page["page_number"] != page_number:
             continue
 
@@ -193,17 +193,17 @@ def get_words_in_box(
             ix1 = max(bx1, wx1)
             iy1 = max(by1, wy1)
             ix2 = min(bx2, wx2)
-            iy2 = min(by2, wy2)
+            iy2 = min(by2, wy2) # to get the whole wo
 
             if ix2 <= ix1 or iy2 <= iy1:
                 continue   # no overlap
 
-            inter_area = (ix2 - ix1) * (iy2 - iy1)
-            word_area  = max((wx2 - wx1) * (wy2 - wy1), 1e-9)
+            inter_area = (ix2 - ix1) * (iy2 - iy1) # area of the intersection between the user-drawn box and the word's bounding box, calculated in normalised coordinates. This represents how much of the word is covered by the user's selection.
+            word_area  = max((wx2 - wx1) * (wy2 - wy1), 1e-9) # avoid division by zero for very small words 
 
             if inter_area / word_area >= overlap_threshold:
                 # Sort key: round top coord to group lines, then left coord
-                matched.append((round(wy1, 3), wx1, word["content"]))
+                matched.append((round(wy1, 3), wx1, word["content"])) 
 
-    matched.sort(key=lambda t: (t[0], t[1]))   # reading order
-    return " ".join(w[2] for w in matched)
+    matched.sort(key=lambda t: (t[0], t[1]))   # reading order 
+    return " ".join(w[2] for w in matched) # returns the concatenated text of all matched words, preserving the reading order.

@@ -1,7 +1,7 @@
 import fitz  # PyMuPDF
 
 
-def build_labels_json(filename: str, annotations: list, pdf_bytes: bytes) -> dict:
+def build_labels_json(filename: str, annotations: list, pdf_bytes: bytes) -> dict: #annotation bounding box
     """
     Produces a <pdf>.labels.json matching the Azure DI 2021-03-01 schema.
 
@@ -29,11 +29,11 @@ def build_labels_json(filename: str, annotations: list, pdf_bytes: bytes) -> dic
         # Normalised corner coords (0–1 relative to page dimensions)
         x0n = ann["x"]               / iw
         y0n = ann["y"]               / ih
-        x1n = (ann["x"] + ann["w"])  / iw
+        x1n = (ann["x"] + ann["w"])  / iw #from annotation box
         y1n = (ann["y"] + ann["h"])  / ih
 
         # Clamp to [0, 1]
-        x0n, y0n = max(0.0, x0n), max(0.0, y0n)
+        x0n, y0n = max(0.0, x0n), max(0.0, y0n) # to not execude page boundries on streamlit draw box.
         x1n, y1n = min(1.0, x1n), min(1.0, y1n)
 
         # Skip degenerate boxes
@@ -41,13 +41,13 @@ def build_labels_json(filename: str, annotations: list, pdf_bytes: bytes) -> dic
             continue
 
         # Flat 8-element clockwise polygon: TL TR BR BL
-        bbox = [x0n, y0n,  x1n, y0n,  x1n, y1n,  x0n, y1n]
+        bbox = [x0n, y0n,  x1n, y0n,  x1n, y1n,  x0n, y1n] #top left, top right, bottom right, bottom left of bounding box
 
         text = ann.get("text", "").strip()
 
         label_entry: dict = {
             "label": ann["field"],
-            "key":   None,           # ← required by schema, must be present
+            "key":   None,           # ← required by schema, must be present 
             "value": [
                 {
                     "page":          ann["page"] + 1,   # 1-based

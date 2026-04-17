@@ -26,17 +26,17 @@ def get_page_count(pdf_bytes: bytes) -> int:
 def extract_text_from_box(
     pdf_bytes: bytes,
     page_num: int,
-    x_px: int, y_px: int, w_px: int, h_px: int,
-    img_w: int, img_h: int,
+    x_px: int, y_px: int, w_px: int, h_px: int, #user-drawn box 
+    img_w: int, img_h: int, # for normaliatiom
 ) -> str:
     doc   = fitz.open(stream=pdf_bytes, filetype="pdf")
     page  = doc[page_num]
-    pw    = page.rect.width
+    pw    = page.rect.width 
     ph    = page.rect.height
-    sx    = pw / img_w
+    sx    = pw / img_w 
     sy    = ph / img_h
-    clip  = fitz.Rect(x_px*sx, y_px*sy, (x_px+w_px)*sx, (y_px+h_px)*sy)
-    words = page.get_text("words", clip=clip, sort=True)
+    clip  = fitz.Rect(x_px*sx, y_px*sy, (x_px+w_px)*sx, (y_px+h_px)*sy) #only draw box area
+    words = page.get_text("words", clip=clip, sort=True) #order left, right, top, bottom
     text  = " ".join(w[4] for w in words).strip()
     if not text:
         text = page.get_text("text", clip=clip).strip()
@@ -46,17 +46,17 @@ def extract_text_from_box(
 def draw_annotations_on_img(img, annotations, fields, page_num):
     out  = img.copy()
     draw = ImageDraw.Draw(out)
-    iw, ih = out.size
-    for a in annotations:
+    iw, ih = out.size # for scaling annotation coordinates to the displayed image size.
+    for a in annotations: 
         if a["page"] != page_num:
             continue
-        color = field_color(fields, a["field"])
+        color = field_color(fields, a["field"]) #get color for the field being annotated
         sx = iw / a.get("img_width",  iw)
         sy = ih / a.get("img_height", ih)
         x0 = int(a["x"] * sx);  y0 = int(a["y"] * sy)
         x1 = int((a["x"] + a["w"]) * sx); y1 = int((a["y"] + a["h"]) * sy)
-        draw.rectangle([x0, y0, x1, y1], outline=color, width=3)
-        label = a["field"] + (f': {a["text"][:20]}' if a.get("text") else "")
+        draw.rectangle([x0, y0, x1, y1], outline=color, width=3) # annotation box is drawn on the image using the scaled coordinates, with a color corresponding to the annotated field.
+        label = a["field"] + (f': {a["text"][:20]}' if a.get("text") else "") #chosen field 
         draw.rectangle([x0, max(0, y0-18), x0+len(label)*7+6, y0], fill=color)
-        draw.text((x0+3, max(0, y0-16)), label, fill="white")
+        draw.text((x0+3, max(0, y0-16)), label, fill="white") # text of field above
     return out

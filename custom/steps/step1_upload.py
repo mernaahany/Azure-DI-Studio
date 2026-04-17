@@ -25,7 +25,7 @@ _TYPE_ICONS = {
 def _get_ext(filename: str) -> str:
     return filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
  
- 
+#t to extract file extension and normalize to lowercase; returns empty string if no extension found to diff between pdfs, img.
 def _render_thumbnail(fname: str, file_bytes: bytes):
     """Try to show a preview; fall back to a labelled icon on any error."""
     ext = _get_ext(fname)
@@ -54,17 +54,28 @@ def render_step1():
         "Upload **at least 5 documents** to train a robust custom model.  \n"
         "Supported formats: **PDF, PNG, JPG/JPEG, TIFF**"
     )
- 
+
     uploaded = st.file_uploader(
         "Choose documents",
         type=ACCEPTED_EXTENSIONS,
         accept_multiple_files=True,
     )
-    if uploaded:
+
+    # Sync session state to exactly what's currently in the uploader.
+    # This ensures clicking ✕ on any file removes it from state too.
+    if uploaded is not None:
+        current_names = {f.name for f in uploaded}
+
+        # Add any newly uploaded files
         for f in uploaded:
             if f.name not in st.session_state.uploaded_files:
                 st.session_state.uploaded_files[f.name] = f.read()
- 
+
+        # Remove files that were dismissed via ✕
+        removed = [name for name in st.session_state.uploaded_files if name not in current_names]
+        for name in removed:
+            del st.session_state.uploaded_files[name]
+
     count = len(st.session_state.uploaded_files)
     if count:
         st.success(f"✅ {count} document(s) ready")
@@ -72,7 +83,7 @@ def render_step1():
         for i, fname in enumerate(st.session_state.uploaded_files):
             with cols[i % 4]:
                 _render_thumbnail(fname, st.session_state.uploaded_files[fname])
- 
+
         if count < 5:
             st.warning(f"Need {5 - count} more document(s) to continue.")
         else:

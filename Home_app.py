@@ -5,7 +5,7 @@ then navigates to the correct Streamlit page.
 """
 
 import streamlit as st
-from prebuilt.ui.theme import apply_theme, PRIMARY, ACCENT, TEXT_MUTED, BORDER   # ← fixed: was prebuilt.ui.theme
+from theme import apply_theme, PRIMARY, ACCENT, TEXT_MUTED, BORDER   # ← fixed: was prebuilt.ui.theme
 
 st.set_page_config(
     page_title="Azure Document Intelligence",
